@@ -6,8 +6,21 @@
 const TRANSACTION_FIELDS = ['id', 'date', 'type', 'category', 'description', 'amount', 'createdAt'];
 const CATEGORY_FIELDS = ['type', 'category'];
 
+function getSpreadsheet_() {
+  const props = PropertiesService.getScriptProperties();
+  const id = props.getProperty('SPREADSHEET_ID');
+  if (!id) {
+    throw new Error('SPREADSHEET_ID not set. Run setup() first.');
+  }
+  return SpreadsheetApp.openById(id);
+}
+
+function setSpreadsheetId(id) {
+  PropertiesService.getScriptProperties().setProperty('SPREADSHEET_ID', id);
+}
+
 function getSheet_(name) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet_();
   const sheet = ss.getSheetByName(name);
   if (!sheet) {
     throw new Error('Sheet not found: ' + name);

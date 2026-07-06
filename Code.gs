@@ -33,16 +33,25 @@ function include(filename) {
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
-function setup() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+function setup(spreadsheetId) {
+  let ss;
+  if (spreadsheetId) {
+    ss = SpreadsheetApp.openById(spreadsheetId);
+  } else {
+    ss = SpreadsheetApp.create('Finance Tracker');
+  }
+
+  setSpreadsheetId(ss.getId());
 
   createSheet_(ss, SHEET_TRANSACTIONS, TRANSACTIONS_HEADERS);
   const categoriesSheet = createSheet_(ss, SHEET_CATEGORIES, CATEGORIES_HEADERS);
 
   seedCategories_(categoriesSheet);
 
-  ss.toast('Finance Tracker setup complete', 'Setup', 5);
-  return 'Setup complete';
+  const url = ss.getUrl();
+  Logger.log('Spreadsheet URL: ' + url);
+  Logger.log('Spreadsheet ID: ' + ss.getId());
+  return 'Setup complete. Spreadsheet: ' + url;
 }
 
 function createSheet_(ss, sheetName, headers) {
