@@ -111,10 +111,24 @@ Report Page → ReportService → Filter Data → Aggregate → Return JSON
 
 | Service | Function |
 |---------|----------|
-| Dashboard | `getDashboard()` |
+| Dashboard | `getDashboard()` - Returns period-based summary (28th-27th cycle) |
 | Category | `getCategories(type)` |
 | Transaction | `saveTransaction(data)` |
-| Report | `getDailyReport(date)`, `getMonthlyReport(month, year)`, `getRangeReport(startDate, endDate)` |
+| Report | `getPeriodReport()`, `getDailyReport(date)`, `getMonthlyReport(month, year)`, `getRangeReport(startDate, endDate)` |
+
+---
+
+## Period System
+
+Dashboard dan Report menggunakan siklus periode gajian (28-27):
+
+- **Periode**: 28 bulan sebelumnya → 27 bulan ini
+- Contoh: Hari ini 6 Juli 2026 → Periode: **28 Jun - 27 Jul 2026**
+- Contoh: Hari ini 28 Juli 2026 → Periode: **28 Jul - 27 Ags 2026**
+
+Logika:
+- Jika tanggal >= 28: periode = 28 bulan ini → 27 bulan depan
+- Jika tanggal < 28: periode = 28 bulan lalu → 27 bulan ini
 
 ---
 

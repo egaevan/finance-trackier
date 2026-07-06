@@ -45,12 +45,27 @@ function getRangeReport(startDate, endDate) {
   }
 }
 
-function buildReport_(transactions) {
+function getPeriodReport() {
+  try {
+    const period = getCurrentPeriod_();
+    const transactions = readTransactions().filter(function (t) {
+      return isInDateRange_(t.date, period.start, period.end);
+    });
+    return successResponse(buildReport_(transactions, period.start, period.end));
+  } catch (e) {
+    return errorResponse(e.message);
+  }
+}
+
+function buildReport_(transactions, periodStart, periodEnd) {
   const totals = sumByType_(transactions);
-  return {
+  const result = {
     income: totals.income,
     expense: totals.expense,
     balance: totals.net,
     transactions: transactions
   };
+  if (periodStart) result.periodStart = periodStart;
+  if (periodEnd) result.periodEnd = periodEnd;
+  return result;
 }

@@ -38,6 +38,7 @@
       .summary-card.income .value { color: var(--income); }
       .summary-card.expense .value { color: var(--expense); }
       .summary-card.balance .value { color: var(--primary); }
+      .period-range { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
       .section-title { font-size: 16px; font-weight: 600; margin: 18px 0 10px; }
       .transaction-list { list-style: none; }
       .transaction-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
@@ -117,12 +118,14 @@
           <div class="value" id="dashboard-balance">Rp 0</div>
         </div>
         <div class="card summary-card income">
-          <div class="label">Income Bulan Ini</div>
+          <div class="label">Income Periode</div>
           <div class="value" id="dashboard-income">Rp 0</div>
+          <div class="period-range" id="dashboard-period-range"></div>
         </div>
         <div class="card summary-card expense">
-          <div class="label">Expense Bulan Ini</div>
+          <div class="label">Expense Periode</div>
           <div class="value" id="dashboard-expense">Rp 0</div>
+          <div class="period-range" id="dashboard-period-expense-range"></div>
         </div>
         <div class="section-title">5 Transaksi Terakhir</div>
         <div class="card">
@@ -182,11 +185,19 @@
           <div class="spinner dark show"></div>
         </div>
         <div class="tabs">
-          <button class="tab active" data-tab="daily">Daily</button>
+          <button class="tab active" data-tab="period">Periode</button>
+          <button class="tab" data-tab="daily">Daily</button>
           <button class="tab" data-tab="monthly">Monthly</button>
           <button class="tab" data-tab="range">Range Date</button>
         </div>
-        <div id="panel-daily" class="tab-panel active">
+        <div id="panel-period" class="tab-panel active">
+          <div class="card" style="margin-bottom: 16px;">
+            <div class="label" style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px;">Periode Aktif</div>
+            <div id="period-range-display" style="font-size: 16px; font-weight: 600;">Memuat...</div>
+          </div>
+          <button class="btn" id="period-btn">Tampilkan</button>
+        </div>
+        <div id="panel-daily" class="tab-panel">
           <div class="form-group">
             <label for="daily-date">Tanggal</label>
             <input type="date" id="daily-date" name="daily-date">
@@ -295,8 +306,11 @@
             if (!result || !result.success) { showDashboardError(result ? (result.error || 'Gagal memuat data') : 'Terjadi kesalahan'); return; }
             var d = result.data;
             document.getElementById('dashboard-balance').textContent = formatRupiah(d.balance);
-            document.getElementById('dashboard-income').textContent = formatRupiah(d.monthlyIncome);
-            document.getElementById('dashboard-expense').textContent = formatRupiah(d.monthlyExpense);
+            document.getElementById('dashboard-income').textContent = formatRupiah(d.periodIncome);
+            document.getElementById('dashboard-expense').textContent = formatRupiah(d.periodExpense);
+            var periodText = formatDate(d.periodStart) + ' - ' + formatDate(d.periodEnd);
+            document.getElementById('dashboard-period-range').textContent = periodText;
+            document.getElementById('dashboard-period-expense-range').textContent = periodText;
             renderTransactionList('dashboard-recent', d.recentTransactions);
           })
           .withFailureHandler(function (err) {
@@ -413,7 +427,7 @@
       }
 
       // === Report ===
-      var currentReportTab = 'daily';
+      var currentReportTab = 'period';
 
       function showReportLoader(show) {
         var el = document.getElementById('report-loader');
@@ -479,6 +493,23 @@
           .getRangeReport(start, end);
       }
 
+      function loadPeriodReport() {
+        hideReportError(); showReportLoader(true);
+        google.script.run
+          .withSuccessHandler(function (r) {
+            showReportLoader(false);
+            if (r && r.success) {
+              var d = r.data;
+              document.getElementById('period-range-display').textContent = formatDate(d.periodStart) + ' - ' + formatDate(d.periodEnd);
+              renderReportResult(d);
+            } else {
+              showReportError(r ? (r.error || 'Gagal memuat laporan') : 'Terjadi kesalahan');
+            }
+          })
+          .withFailureHandler(function (e) { showReportLoader(false); showReportError(e.message || 'Kesalahan koneksi'); })
+          .getPeriodReport();
+      }
+
       function initReportTabs() {
         document.querySelectorAll('.tabs .tab').forEach(function (tab) {
           tab.addEventListener('click', function () {
@@ -487,12 +518,14 @@
             document.querySelectorAll('.tab-panel').forEach(function (p) { p.classList.toggle('active', p.id === 'panel-' + currentReportTab); });
           });
         });
+        document.getElementById('period-btn').addEventListener('click', loadPeriodReport);
         document.getElementById('daily-btn').addEventListener('click', loadDailyReport);
         document.getElementById('monthly-btn').addEventListener('click', loadMonthlyReport);
         document.getElementById('range-btn').addEventListener('click', loadRangeReport);
         var now = new Date();
         document.getElementById('monthly-month').value = String(now.getMonth() + 1);
         document.getElementById('monthly-year').value = String(now.getFullYear());
+        loadPeriodReport();
       }
 
       // === Init ===
@@ -508,7 +541,8 @@
         });
         document.querySelector('#dashboard-error .retry-btn').addEventListener('click', loadDashboard);
         document.querySelector('#report-error .retry-btn').addEventListener('click', function () {
-          if (currentReportTab === 'daily') loadDailyReport();
+          if (currentReportTab === 'period') loadPeriodReport();
+          else if (currentReportTab === 'daily') loadDailyReport();
           else if (currentReportTab === 'monthly') loadMonthlyReport();
           else loadRangeReport();
         });

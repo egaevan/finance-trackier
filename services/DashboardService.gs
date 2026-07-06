@@ -42,13 +42,12 @@ function getMonthlyExpense(year, month) {
 function getDashboard() {
   try {
     const transactions = readTransactions();
-    const now = new Date();
-    const period = { year: now.getFullYear(), month: now.getMonth() + 1 };
+    const period = getCurrentPeriod_();
 
-    const monthTransactions = transactions.filter(function (t) {
-      return isInMonth_(t.date, period.year, period.month);
+    const periodTransactions = transactions.filter(function (t) {
+      return isInDateRange_(t.date, period.start, period.end);
     });
-    const monthTotals = sumByType_(monthTransactions);
+    const periodTotals = sumByType_(periodTransactions);
     const allTotals = sumByType_(transactions);
 
     const sorted = sortTransactionsByDateDesc_(transactions);
@@ -56,13 +55,34 @@ function getDashboard() {
 
     return successResponse({
       balance: allTotals.net,
-      monthlyIncome: monthTotals.income,
-      monthlyExpense: monthTotals.expense,
+      periodIncome: periodTotals.income,
+      periodExpense: periodTotals.expense,
+      periodStart: period.start,
+      periodEnd: period.end,
       recentTransactions: recent
     });
   } catch (e) {
     return errorResponse(e.message);
   }
+}
+
+function getCurrentPeriod_() {
+  const now = new Date();
+  const day = now.getDate();
+  let start, end;
+
+  if (day >= 28) {
+    start = new Date(now.getFullYear(), now.getMonth(), 28);
+    end = new Date(now.getFullYear(), now.getMonth() + 1, 27);
+  } else {
+    start = new Date(now.getFullYear(), now.getMonth() - 1, 28);
+    end = new Date(now.getFullYear(), now.getMonth(), 27);
+  }
+
+  return {
+    start: toDateString(start),
+    end: toDateString(end)
+  };
 }
 
 function resolveMonthPeriod_(year, month) {
