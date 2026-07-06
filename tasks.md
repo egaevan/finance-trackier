@@ -43,32 +43,32 @@ Categories
 
 ## Transaction Service
 
-- [ ] saveTransaction()
-- [ ] getRecentTransactions()
-- [ ] getAllTransactions()
+- [x] saveTransaction()
+- [x] getRecentTransactions()
+- [x] getAllTransactions()
 
 ---
 
 ## Category Service
 
-- [ ] getCategories(type)
+- [x] getCategories(type)
 
 ---
 
 ## Dashboard Service
 
-- [ ] getBalance()
-- [ ] getMonthlyIncome()
-- [ ] getMonthlyExpense()
-- [ ] getDashboard()
+- [x] getBalance()
+- [x] getMonthlyIncome()
+- [x] getMonthlyExpense()
+- [x] getDashboard()
 
 ---
 
 ## Report Service
 
-- [ ] getDailyReport()
-- [ ] getMonthlyReport()
-- [ ] getRangeReport()
+- [x] getDailyReport()
+- [x] getMonthlyReport()
+- [x] getRangeReport()
 
 ---
 
