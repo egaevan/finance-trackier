@@ -2,30 +2,30 @@
 <html>
   <head>
     <base target="_top">
-    <?!= include('css/style') ?>
+    <?!= include('css_style') ?>
   </head>
   <body>
-    <?!= include('partials/navbar') ?>
+    <?!= include('partials_navbar') ?>
 
     <div class="container">
       <div id="page-dashboard" class="page active">
-        <?!= include('views/dashboard') ?>
+        <?!= include('views_dashboard') ?>
       </div>
 
       <div id="page-transaction" class="page">
-        <?!= include('views/transaction') ?>
+        <?!= include('views_transaction') ?>
       </div>
 
       <div id="page-report" class="page">
-        <?!= include('views/report') ?>
+        <?!= include('views_report') ?>
       </div>
     </div>
 
-    <?!= include('partials/footer') ?>
+    <?!= include('partials_footer') ?>
 
-    <?!= include('js/dashboard.js') ?>
-    <?!= include('js/transaction.js') ?>
-    <?!= include('js/report.js') ?>
+    <?!= include('js_dashboard') ?>
+    <?!= include('js_transaction') ?>
+    <?!= include('js_report') ?>
 
     <script>
       function navigateTo(page) {

@@ -23,7 +23,7 @@ const DEFAULT_CATEGORIES = [
 ];
 
 function doGet() {
-  const template = HtmlService.createTemplateFromFile('views/index');
+  const template = HtmlService.createTemplateFromFile('views_index');
   return template.evaluate()
     .setTitle('Finance Tracker')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');

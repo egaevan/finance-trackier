@@ -86,33 +86,25 @@ utils/
 
     Response.gs
 
-views/
+views_index.html
 
-    index.html
+views_dashboard.html
 
-    dashboard.html
+views_transaction.html
 
-    transaction.html
+views_report.html
 
-    report.html
+partials_navbar.html
 
-partials/
+partials_footer.html
 
-    navbar.html
+css_style.html
 
-    footer.html
+js_dashboard.js.html
 
-css/
+js_transaction.js.html
 
-    style.html
-
-js/
-
-    dashboard.js.html
-
-    transaction.js.html
-
-    report.js.html
+js_report.js.html
 
 appsscript.json
 
