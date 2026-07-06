@@ -26,7 +26,18 @@ const DEFAULT_CATEGORIES = [
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('views_index')
     .setTitle('Finance Tracker')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function debug() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheets = ss.getSheets().map(function (s) { return s.getName(); });
+    return successResponse({ spreadsheetUrl: ss.getUrl(), sheets: sheets });
+  } catch (e) {
+    return errorResponse(e.message);
+  }
 }
 
 function setup() {
