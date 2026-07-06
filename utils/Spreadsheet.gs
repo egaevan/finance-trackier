@@ -8,11 +8,21 @@ const CATEGORY_FIELDS = ['type', 'category'];
 
 function getSpreadsheet_() {
   const props = PropertiesService.getScriptProperties();
-  const id = props.getProperty('SPREADSHEET_ID');
-  if (!id) {
-    throw new Error('SPREADSHEET_ID not set. Run setup() first.');
+  let id = props.getProperty('SPREADSHEET_ID');
+  if (id) {
+    try {
+      return SpreadsheetApp.openById(id);
+    } catch (e) {
+      props.deleteProperty('SPREADSHEET_ID');
+    }
   }
-  return SpreadsheetApp.openById(id);
+  const ss = SpreadsheetApp.create('Finance Tracker');
+  props.setProperty('SPREADSHEET_ID', ss.getId());
+  createSheet_(ss, SHEET_TRANSACTIONS, TRANSACTIONS_HEADERS);
+  const categoriesSheet = createSheet_(ss, SHEET_CATEGORIES, CATEGORIES_HEADERS);
+  seedCategories_(categoriesSheet);
+  Logger.log('Auto-created spreadsheet: ' + ss.getUrl());
+  return ss;
 }
 
 function setSpreadsheetId(id) {

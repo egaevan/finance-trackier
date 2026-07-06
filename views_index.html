@@ -292,7 +292,7 @@
         google.script.run
           .withSuccessHandler(function (result) {
             showDashboardLoader(false);
-            if (!result || !result.success) { showDashboardError('Gagal memuat data'); return; }
+            if (!result || !result.success) { showDashboardError(result ? (result.error || 'Gagal memuat data') : 'Terjadi kesalahan'); return; }
             var d = result.data;
             document.getElementById('dashboard-balance').textContent = formatRupiah(d.balance);
             document.getElementById('dashboard-income').textContent = formatRupiah(d.monthlyIncome);
@@ -452,7 +452,7 @@
         if (!date) { alert('Pilih tanggal'); return; }
         hideReportError(); showReportLoader(true);
         google.script.run
-          .withSuccessHandler(function (r) { showReportLoader(false); if (r && r.success) renderReportResult(r.data); else showReportError('Gagal memuat laporan'); })
+          .withSuccessHandler(function (r) { showReportLoader(false); if (r && r.success) renderReportResult(r.data); else showReportError(r ? (r.error || 'Gagal memuat laporan') : 'Terjadi kesalahan'); })
           .withFailureHandler(function (e) { showReportLoader(false); showReportError(e.message || 'Kesalahan koneksi'); })
           .getDailyReport(date);
       }
@@ -463,7 +463,7 @@
         if (!month || !year) { alert('Pilih bulan dan tahun'); return; }
         hideReportError(); showReportLoader(true);
         google.script.run
-          .withSuccessHandler(function (r) { showReportLoader(false); if (r && r.success) renderReportResult(r.data); else showReportError('Gagal memuat laporan'); })
+          .withSuccessHandler(function (r) { showReportLoader(false); if (r && r.success) renderReportResult(r.data); else showReportError(r ? (r.error || 'Gagal memuat laporan') : 'Terjadi kesalahan'); })
           .withFailureHandler(function (e) { showReportLoader(false); showReportError(e.message || 'Kesalahan koneksi'); })
           .getMonthlyReport(month, year);
       }
@@ -474,7 +474,7 @@
         if (!start || !end) { alert('Pilih tanggal awal dan akhir'); return; }
         hideReportError(); showReportLoader(true);
         google.script.run
-          .withSuccessHandler(function (r) { showReportLoader(false); if (r && r.success) renderReportResult(r.data); else showReportError('Gagal memuat laporan'); })
+          .withSuccessHandler(function (r) { showReportLoader(false); if (r && r.success) renderReportResult(r.data); else showReportError(r ? (r.error || 'Gagal memuat laporan') : 'Terjadi kesalahan'); })
           .withFailureHandler(function (e) { showReportLoader(false); showReportError(e.message || 'Kesalahan koneksi'); })
           .getRangeReport(start, end);
       }
