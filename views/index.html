@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <?!= include('css/style') ?>
+  </head>
+  <body>
+    <?!= include('partials/navbar') ?>
+
+    <div class="container">
+      <div id="page-dashboard" class="page active">
+        <?!= include('views/dashboard') ?>
+      </div>
+
+      <div id="page-transaction" class="page">
+        <?!= include('views/transaction') ?>
+      </div>
+
+      <div id="page-report" class="page">
+        <?!= include('views/report') ?>
+      </div>
+    </div>
+
+    <?!= include('partials/footer') ?>
+
+    <?!= include('js/dashboard') ?>
+    <?!= include('js/transaction') ?>
+    <?!= include('js/report') ?>
+
+    <script>
+      function navigateTo(page) {
+        var pages = document.querySelectorAll('.page');
+        for (var i = 0; i < pages.length; i++) {
+          pages[i].classList.remove('active');
+        }
+        document.getElementById('page-' + page).classList.add('active');
+
+        var links = document.querySelectorAll('.nav-link');
+        for (var j = 0; j < links.length; j++) {
+          links[j].classList.toggle('active', links[j].getAttribute('data-page') === page);
+        }
+
+        if (page === 'dashboard' && typeof loadDashboard === 'function') {
+          loadDashboard();
+        }
+        if (page === 'report' && typeof loadReport === 'function') {
+          loadReport();
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', function () {
+        var links = document.querySelectorAll('.nav-link');
+        for (var i = 0; i < links.length; i++) {
+          links[i].addEventListener('click', function () {
+            navigateTo(this.getAttribute('data-page'));
+          });
+        }
+
+        if (typeof loadDashboard === 'function') {
+          loadDashboard();
+        }
+      });
+    </script>
+  </body>
+</html>

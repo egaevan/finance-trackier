@@ -76,24 +76,24 @@ Categories
 
 ## Dashboard
 
-- [ ] Summary Card
-- [ ] Recent Transactions
+- [x] Summary Card
+- [x] Recent Transactions
 
 ---
 
 ## Transaction Page
 
-- [ ] Form Input
-- [ ] Validation
-- [ ] Success Notification
+- [x] Form Input
+- [x] Validation
+- [x] Success Notification
 
 ---
 
 ## Report Page
 
-- [ ] Daily Report
-- [ ] Monthly Report
-- [ ] Range Report
+- [x] Daily Report
+- [x] Monthly Report
+- [x] Range Report
 
 ---
 

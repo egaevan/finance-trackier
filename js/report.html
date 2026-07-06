@@ -1,0 +1,127 @@
+<script>
+  var currentReportTab = 'daily';
+
+  function initReportTabs() {
+    var tabs = document.querySelectorAll('.tabs .tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].addEventListener('click', function () {
+        var tab = this.getAttribute('data-tab');
+        switchTab(tab);
+      });
+    }
+
+    document.getElementById('daily-btn').addEventListener('click', loadDailyReport);
+    document.getElementById('monthly-btn').addEventListener('click', loadMonthlyReport);
+    document.getElementById('range-btn').addEventListener('click', loadRangeReport);
+
+    var now = new Date();
+    var monthSelect = document.getElementById('monthly-month');
+    var yearInput = document.getElementById('monthly-year');
+    if (monthSelect) monthSelect.value = String(now.getMonth() + 1);
+    if (yearInput) yearInput.value = String(now.getFullYear());
+  }
+
+  function switchTab(tab) {
+    currentReportTab = tab;
+    var tabs = document.querySelectorAll('.tabs .tab');
+    for (var i = 0; i < tabs.length; i++) {
+      tabs[i].classList.toggle('active', tabs[i].getAttribute('data-tab') === tab);
+    }
+    var panels = document.querySelectorAll('.tab-panel');
+    for (var j = 0; j < panels.length; j++) {
+      panels[j].classList.toggle('active', panels[j].id === 'panel-' + tab);
+    }
+  }
+
+  function renderReportResult(data) {
+    var container = document.getElementById('report-result');
+    if (!container) return;
+    if (!data || !data.transactions || data.transactions.length === 0) {
+      container.innerHTML =
+        '<div class="report-summary">' +
+        '<div class="card"><div class="label">Income</div><div class="value" style="color:var(--income);">' + formatRupiah(0) + '</div></div>' +
+        '<div class="card"><div class="label">Expense</div><div class="value" style="color:var(--expense);">' + formatRupiah(0) + '</div></div>' +
+        '<div class="card"><div class="label">Saldo</div><div class="value" style="color:var(--primary);">' + formatRupiah(0) + '</div></div>' +
+        '</div>' +
+        '<div class="card"><ul class="transaction-list"><li class="empty-state">Tidak ada transaksi</li></ul></div>';
+      return;
+    }
+
+    var html =
+      '<div class="report-summary">' +
+      '<div class="card"><div class="label">Income</div><div class="value" style="color:var(--income);">' + formatRupiah(data.income) + '</div></div>' +
+      '<div class="card"><div class="label">Expense</div><div class="value" style="color:var(--expense);">' + formatRupiah(data.expense) + '</div></div>' +
+      '<div class="card"><div class="label">Saldo</div><div class="value" style="color:var(--primary);">' + formatRupiah(data.balance) + '</div></div>' +
+      '</div>' +
+      '<div class="card"><ul class="transaction-list">';
+
+    for (var i = 0; i < data.transactions.length; i++) {
+      var t = data.transactions[i];
+      var sign = t.type === 'Income' ? '+' : '-';
+      var cls = t.type === 'Income' ? 'income' : 'expense';
+      html += '<li class="transaction-item">' +
+        '<div class="info">' +
+        '<div class="category">' + escapeHtml(t.category) + '</div>' +
+        '<div class="meta">' + formatDate(t.date) + (t.description ? ' - ' + escapeHtml(t.description) : '') + '</div>' +
+        '</div>' +
+        '<div class="amount ' + cls + '">' + sign + ' ' + formatRupiah(t.amount) + '</div>' +
+        '</li>';
+    }
+
+    html += '</ul></div>';
+    container.innerHTML = html;
+  }
+
+  function loadReport() {
+    var container = document.getElementById('report-result');
+    if (container) container.innerHTML = '';
+  }
+
+  function loadDailyReport() {
+    var dateInput = document.getElementById('daily-date');
+    var date = dateInput ? dateInput.value : '';
+    if (!date) {
+      alert('Pilih tanggal');
+      return;
+    }
+    if (typeof getDailyReportData === 'function') {
+      getDailyReportData(date, function (result) {
+        if (result && result.success) renderReportResult(result.data);
+      });
+    }
+  }
+
+  function loadMonthlyReport() {
+    var monthEl = document.getElementById('monthly-month');
+    var yearEl = document.getElementById('monthly-year');
+    var month = monthEl ? monthEl.value : '';
+    var year = yearEl ? yearEl.value : '';
+    if (!month || !year) {
+      alert('Pilih bulan dan tahun');
+      return;
+    }
+    if (typeof getMonthlyReportData === 'function') {
+      getMonthlyReportData(month, year, function (result) {
+        if (result && result.success) renderReportResult(result.data);
+      });
+    }
+  }
+
+  function loadRangeReport() {
+    var startEl = document.getElementById('range-start');
+    var endEl = document.getElementById('range-end');
+    var start = startEl ? startEl.value : '';
+    var end = endEl ? endEl.value : '';
+    if (!start || !end) {
+      alert('Pilih tanggal awal dan akhir');
+      return;
+    }
+    if (typeof getRangeReportData === 'function') {
+      getRangeReportData(start, end, function (result) {
+        if (result && result.success) renderReportResult(result.data);
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initReportTabs);
+</script>

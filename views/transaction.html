@@ -1,0 +1,44 @@
+<div class="notification" id="transaction-notification"></div>
+
+<form id="transaction-form" novalidate>
+  <div class="form-group">
+    <label for="trx-date">Tanggal</label>
+    <input type="date" id="trx-date" name="date">
+    <div class="error-text" id="error-date"></div>
+  </div>
+
+  <div class="form-group">
+    <label>Jenis</label>
+    <div class="radio-group">
+      <input type="radio" id="type-income" name="type" value="Income">
+      <label for="type-income">Income</label>
+      <input type="radio" id="type-expense" name="type" value="Expense">
+      <label for="type-expense">Expense</label>
+    </div>
+    <div class="error-text" id="error-type"></div>
+  </div>
+
+  <div class="form-group">
+    <label for="trx-category">Kategori</label>
+    <select id="trx-category" name="category">
+      <option value="">Pilih kategori</option>
+    </select>
+    <div class="error-text" id="error-category"></div>
+  </div>
+
+  <div class="form-group">
+    <label for="trx-amount">Nominal</label>
+    <input type="number" id="trx-amount" name="amount" min="1" placeholder="0">
+    <div class="error-text" id="error-amount"></div>
+  </div>
+
+  <div class="form-group">
+    <label for="trx-description">Deskripsi</label>
+    <textarea id="trx-description" name="description" placeholder="Catatan (opsional)"></textarea>
+  </div>
+
+  <button type="submit" class="btn" id="trx-save-btn">
+    <span id="trx-save-text">Simpan</span>
+    <span class="spinner" id="trx-spinner"></span>
+  </button>
+</form>

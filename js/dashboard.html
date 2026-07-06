@@ -1,0 +1,82 @@
+<script>
+  function formatRupiah(amount) {
+    var n = Number(amount) || 0;
+    return 'Rp ' + n.toLocaleString('id-ID');
+  }
+
+  function formatDate(dateValue) {
+    if (!dateValue) return '-';
+    var d = new Date(dateValue);
+    if (isNaN(d.getTime())) return String(dateValue);
+    var day = String(d.getDate()).padStart(2, '0');
+    var month = String(d.getMonth() + 1).padStart(2, '0');
+    var year = d.getFullYear();
+    return day + '/' + month + '/' + year;
+  }
+
+  function renderTransactionList(containerId, transactions) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!transactions || transactions.length === 0) {
+      container.innerHTML = '<li class="empty-state">Belum ada transaksi</li>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < transactions.length; i++) {
+      var t = transactions[i];
+      var sign = t.type === 'Income' ? '+' : '-';
+      var cls = t.type === 'Income' ? 'income' : 'expense';
+      html += '<li class="transaction-item">' +
+        '<div class="info">' +
+        '<div class="category">' + escapeHtml(t.category) + '</div>' +
+        '<div class="meta">' + formatDate(t.date) + (t.description ? ' - ' + escapeHtml(t.description) : '') + '</div>' +
+        '</div>' +
+        '<div class="amount ' + cls + '">' + sign + ' ' + formatRupiah(t.amount) + '</div>' +
+        '</li>';
+    }
+    container.innerHTML = html;
+  }
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function loadDashboard() {
+    var balanceEl = document.getElementById('dashboard-balance');
+    var incomeEl = document.getElementById('dashboard-income');
+    var expenseEl = document.getElementById('dashboard-expense');
+    var recentEl = document.getElementById('dashboard-recent');
+
+    if (balanceEl) balanceEl.textContent = formatRupiah(0);
+    if (incomeEl) incomeEl.textContent = formatRupiah(0);
+    if (expenseEl) expenseEl.textContent = formatRupiah(0);
+    if (recentEl) recentEl.innerHTML = '<li class="empty-state">Belum ada transaksi</li>';
+
+    if (typeof getDashboardData === 'function') {
+      getDashboardData(handleDashboardResult);
+    }
+  }
+
+  function handleDashboardResult(result) {
+    if (!result || !result.success) {
+      return;
+    }
+    var data = result.data;
+    var balanceEl = document.getElementById('dashboard-balance');
+    var incomeEl = document.getElementById('dashboard-income');
+    var expenseEl = document.getElementById('dashboard-expense');
+
+    if (balanceEl) balanceEl.textContent = formatRupiah(data.balance);
+    if (incomeEl) incomeEl.textContent = formatRupiah(data.monthlyIncome);
+    if (expenseEl) expenseEl.textContent = formatRupiah(data.monthlyExpense);
+
+    renderTransactionList('dashboard-recent', data.recentTransactions);
+  }
+</script>

@@ -1,0 +1,159 @@
+<script>
+  function clearValidationErrors() {
+    var groups = document.querySelectorAll('#transaction-form .form-group');
+    for (var i = 0; i < groups.length; i++) {
+      groups[i].classList.remove('invalid');
+    }
+    var errors = document.querySelectorAll('#transaction-form .error-text');
+    for (var j = 0; j < errors.length; j++) {
+      errors[j].textContent = '';
+      errors[j].classList.remove('show');
+    }
+  }
+
+  function showFieldError(field, message) {
+    var group = document.getElementById(field);
+    if (!group) return;
+    var formGroup = group.closest('.form-group');
+    var errorEl = document.getElementById('error-' + field);
+    if (formGroup) formGroup.classList.add('invalid');
+    if (errorEl) {
+      errorEl.textContent = message;
+      errorEl.classList.add('show');
+    }
+  }
+
+  function validateTransactionForm() {
+    clearValidationErrors();
+    var valid = true;
+
+    var date = document.getElementById('trx-date').value;
+    if (!date) {
+      showFieldError('trx-date', 'Tanggal wajib diisi');
+      valid = false;
+    }
+
+    var type = document.querySelector('input[name="type"]:checked');
+    if (!type) {
+      showFieldError('type', 'Jenis transaksi wajib dipilih');
+      valid = false;
+    }
+
+    var category = document.getElementById('trx-category').value;
+    if (!category) {
+      showFieldError('trx-category', 'Kategori wajib dipilih');
+      valid = false;
+    }
+
+    var amount = document.getElementById('trx-amount').value;
+    if (!amount) {
+      showFieldError('trx-amount', 'Nominal wajib diisi');
+      valid = false;
+    } else if (Number(amount) <= 0) {
+      showFieldError('trx-amount', 'Nominal harus lebih dari 0');
+      valid = false;
+    }
+
+    return valid;
+  }
+
+  function showTransactionNotification(message, isError) {
+    var el = document.getElementById('transaction-notification');
+    if (!el) return;
+    el.textContent = message;
+    el.className = 'notification show ' + (isError ? 'error' : 'success');
+    setTimeout(function () {
+      el.classList.remove('show');
+    }, 4000);
+  }
+
+  function setSaveButtonLoading(loading) {
+    var btn = document.getElementById('trx-save-btn');
+    var text = document.getElementById('trx-save-text');
+    var spinner = document.getElementById('trx-spinner');
+    if (btn) btn.disabled = loading;
+    if (text) text.style.display = loading ? 'none' : '';
+    if (spinner) spinner.classList.toggle('show', loading);
+  }
+
+  function resetTransactionForm() {
+    var form = document.getElementById('transaction-form');
+    if (form) form.reset();
+    clearValidationErrors();
+    var today = new Date().toISOString().split('T')[0];
+    var dateInput = document.getElementById('trx-date');
+    if (dateInput) dateInput.value = today;
+    loadCategoriesByType();
+  }
+
+  function loadCategoriesByType() {
+    var typeEl = document.querySelector('input[name="type"]:checked');
+    var catEl = document.getElementById('trx-category');
+    if (!catEl) return;
+
+    catEl.innerHTML = '<option value="">Pilih kategori</option>';
+    if (!typeEl) return;
+
+    if (typeof getCategoryList === 'function') {
+      getCategoryList(typeEl.value, function (result) {
+        if (!result || !result.success || !result.data) return;
+        for (var i = 0; i < result.data.length; i++) {
+          var opt = document.createElement('option');
+          opt.value = result.data[i].category;
+          opt.textContent = result.data[i].category;
+          catEl.appendChild(opt);
+        }
+      });
+    }
+  }
+
+  function initTransactionForm() {
+    var today = new Date().toISOString().split('T')[0];
+    var dateInput = document.getElementById('trx-date');
+    if (dateInput && !dateInput.value) dateInput.value = today;
+
+    var typeRadios = document.querySelectorAll('input[name="type"]');
+    for (var i = 0; i < typeRadios.length; i++) {
+      typeRadios[i].addEventListener('change', loadCategoriesByType);
+    }
+
+    var form = document.getElementById('transaction-form');
+    if (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (!validateTransactionForm()) return;
+
+        var typeEl = document.querySelector('input[name="type"]:checked');
+        var data = {
+          date: document.getElementById('trx-date').value,
+          type: typeEl ? typeEl.value : '',
+          category: document.getElementById('trx-category').value,
+          amount: document.getElementById('trx-amount').value,
+          description: document.getElementById('trx-description').value
+        };
+
+        setSaveButtonLoading(true);
+        if (typeof saveTransactionData === 'function') {
+          saveTransactionData(data, handleSaveResult);
+        }
+      });
+    }
+  }
+
+  function handleSaveResult(result) {
+    setSaveButtonLoading(false);
+    if (!result) {
+      showTransactionNotification('Terjadi kesalahan', true);
+      return;
+    }
+    if (!result.success) {
+      showTransactionNotification(result.error || 'Gagal menyimpan', true);
+      return;
+    }
+    showTransactionNotification('Transaksi berhasil disimpan', false);
+    resetTransactionForm();
+    if (typeof loadDashboard === 'function') loadDashboard();
+  }
+
+  document.addEventListener('DOMContentLoaded', initTransactionForm);
+</script>

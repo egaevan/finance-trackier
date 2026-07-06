@@ -1,6 +1,7 @@
 /**
  * Simple Personal Finance Tracker
  * Phase 1 - Project Setup
+ * Phase 3 - Frontend
  */
 
 const SHEET_TRANSACTIONS = 'Transactions';
@@ -22,8 +23,14 @@ const DEFAULT_CATEGORIES = [
 ];
 
 function doGet() {
-  return HtmlService.createHtmlOutput('<p>Finance Tracker setup complete. UI coming in Phase 3.</p>')
-    .setTitle('Finance Tracker');
+  const template = HtmlService.createTemplateFromFile('views/index');
+  return template.evaluate()
+    .setTitle('Finance Tracker')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
 function setup() {
