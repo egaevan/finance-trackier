@@ -100,11 +100,11 @@ partials_footer.html
 
 css_style.html
 
-js_dashboard.js.html
+js_dashboard.html
 
-js_transaction.js.html
+js_transaction.html
 
-js_report.js.html
+js_report.html
 
 appsscript.json
 
